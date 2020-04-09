@@ -21,14 +21,14 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Construction Surface
-  m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 64bc212d19bd0dd46b44896be9438b00,
+    type: 3}
   m_ShaderKeywords: _EMISSION
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2050
-  stringTagMap:
-    RenderType: Opaque
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
@@ -89,6 +89,12 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
+    - Color_73114BB: {r: 0.40566036, g: 0.40566036, b: 0.40566036, a: 0}
+    - Color_873A1387: {r: 0.40566036, g: 0.40566036, b: 0.40566036, a: 0}
+    - Color_93CE6B1C: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 0}
+    - Color_B7887831: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 0}
+    - Color_CD5385: {r: 0.735849, g: 0, b: 0, a: 0}
+    - Color_E02ACEC2: {r: 0.735849, g: 0, b: 0, a: 0}
     - _BaseColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _EmissionColor: {r: 0.125, g: 0.125, b: 0.125, a: 1}
