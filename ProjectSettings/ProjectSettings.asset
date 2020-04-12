@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: Wild Box Studio
-  productName: SCP-49
+  productName: 'SCP : Gate C1'
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.071257554, g: 0.07097722, b: 0.07450981, a: 1}
@@ -123,7 +123,7 @@ PlayerSettings:
     16:10: 0
     16:9: 1
     Others: 0
-  bundleVersion: Dev-0.0.0
+  bundleVersion: Dev-2.0.0
   preloadedAssets: []
   metroInputSource: 0
   wsaTransparentSwapchain: 0
