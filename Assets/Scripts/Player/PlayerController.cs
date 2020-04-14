@@ -6,18 +6,24 @@ using UnityEngine.Experimental.GlobalIllumination;
 
 public class PlayerController : MonoBehaviour
 {
-	[Header("PlayerStatistics")]
-	// Movement speed
-	[SerializeField] private float _speed = 2.5f;
-	// Movement speed when sprinting
-	[SerializeField] private float _sprintSpeed = 5f;
-	// X and Y sensivity in the camera
-	[SerializeField] private Vector2 _cameraSensivity = new Vector2(90, -60);
+	[Header("Player statistics")]
+	[SerializeField] private float _speed = 2.5f;													// Movement speed
+	[SerializeField] private float _sprintSpeed = 5f;												// Movement speed when sprinting									  
+	[SerializeField] private Vector2 _cameraSensivity = new Vector2(90, -60);                       // X and Y sensivity in the camera
+	[SerializeField] private float _shotCooldown = 0.20f;                                           // Cooldown between each shot
 
-	// Camera component
-	private Camera _attachedCamera;
-	// Flashlight
-	private GameObject _flashlight;
+
+	[Header("Player components")]
+	[SerializeField] private Transform _muzzleTransform;											// Start position for shots
+
+	private Camera _attachedCamera;																	// Camera component
+	private GameObject _flashlight;                                                                 // Flashlight
+
+
+	// Shooting mechanics
+	private bool _canShoot = true;																	// Can the player shoot
+	private bool _isSelectiveFireOnSemi = true;														// Is the player on semi mod, else he's to be considered on auto
+
 
 	private void Start()
 	{
@@ -32,8 +38,11 @@ public class PlayerController : MonoBehaviour
 
 	private void Update()
 	{
-		if (Input.GetKeyDown(KeyCode.F))
+		// Controls
+		if (Input.GetKeyDown(KeyCode.L))
 			_flashlight.SetActive(!_flashlight.activeSelf);
+		if (Input.GetKeyDown(KeyCode.F))
+			_isSelectiveFireOnSemi = !_isSelectiveFireOnSemi;
 	}
 
 	private void FixedUpdate()
@@ -49,5 +58,22 @@ public class PlayerController : MonoBehaviour
 		// Camera movement
 		_attachedCamera.transform.Rotate(Vector3.right,
 			Input.GetAxis("Mouse Y") * _cameraSensivity.y * Time.fixedDeltaTime);
+
+		// Shooting functions
+		if ((_isSelectiveFireOnSemi ? Input.GetMouseButtonDown(0) : Input.GetMouseButton(0)) && _canShoot)
+			StartCoroutine(Shoot());
+	}
+
+	private IEnumerator Shoot()
+	{
+		_canShoot = false;
+
+		RaycastHit hitInfo;
+		int layerMask = 1 << 8;
+		if (Physics.Raycast(_muzzleTransform.position, _muzzleTransform.forward, out hitInfo, 100f, layerMask))
+			Debug.Log("Enemy shot");
+
+		yield return new WaitForSeconds(_shotCooldown);
+		_canShoot = true;
 	}
 }
