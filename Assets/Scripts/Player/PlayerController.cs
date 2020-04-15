@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float _weaponDamage = 6f;												// Damage the player deal in one shot
 	[SerializeField] private float _reloadTime = 0.8f;												// Time to load a new magazine
 	[SerializeField] private float _shotCooldown = 0.10f;                                           // Cooldown between each shot
-	[SerializeField] private float _recoilStrength = 5f;											// Strenght applied to the weapon when firing
+	[SerializeField] private float _recoilStrength = 2.5f;											// Strenght applied to the weapon when firing
 
 	private int _remainingAmmo;																		// Current ammo stored in the player magazine
 	private int remainingAmmo
@@ -32,7 +32,8 @@ public class PlayerController : MonoBehaviour
 
 
 	[Header("Player components")]
-	[SerializeField] private Transform _muzzleTransform = null;										// Start position for shots
+	[SerializeField] private Transform _muzzleTransform = null;                                     // Start position for shots
+	[SerializeField] private Transform _laserLight = null;											// Light that indicate the impact of a shot
 
 	private Camera _attachedCamera;                                                                 // Camera component
 	private float _cameraAngle = 0;																		// Camera component x angle since the begining of the simulation
@@ -111,6 +112,13 @@ public class PlayerController : MonoBehaviour
 			_cameraAngle += movementValue;
 		}
 
+		RaycastHit hitInfo;
+		if (Physics.Raycast(_muzzleTransform.position, _muzzleTransform.forward, out hitInfo, 100f))
+		{
+			_laserLight.position = hitInfo.point;
+			_laserLight.position = Vector3.MoveTowards(_laserLight.position, _muzzleTransform.position, .01f);
+		}
+
 		// Shooting functions
 		if ((isSelectiveFireOnSemi ? Input.GetMouseButtonDown(0) : Input.GetMouseButton(0)) && _canShoot && _remainingAmmo > 0)
 			StartCoroutine(Shoot());
@@ -126,7 +134,9 @@ public class PlayerController : MonoBehaviour
 		RaycastHit hitInfo;
 		int layerMask = 1 << 8;
 		if (Physics.Raycast(_muzzleTransform.position, _muzzleTransform.forward, out hitInfo, 100f, layerMask))
+		{
 			hitInfo.collider.gameObject.GetComponent<IShootable>()?.Hit(_weaponDamage);
+		}
 
 		// Recoil effect
 		transform.Rotate(Vector3.up, Random.Range(_recoilStrength/-2, _recoilStrength/2));
