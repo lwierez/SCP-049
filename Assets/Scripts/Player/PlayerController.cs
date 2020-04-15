@@ -11,8 +11,10 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float _sprintSpeed = 5f;												// Movement speed when sprinting									  
 	[SerializeField] private Vector2 _cameraSensivity = new Vector2(90, -60);                       // X and Y sensivity in the camera
 	[SerializeField] private int _magSize = 30;                                                     // Size of the magazine of the player's weapon
+	[SerializeField] private float _weaponDamage = 6f;												// Damage the player deal in one shot
 	[SerializeField] private float _reloadTime = 0.8f;												// Time to load a new magazine
 	[SerializeField] private float _shotCooldown = 0.10f;                                           // Cooldown between each shot
+	[SerializeField] private float _recoilStrength = 5f;											// Strenght applied to the weapon when firing
 
 	private int _remainingAmmo;																		// Current ammo stored in the player magazine
 	private int remainingAmmo
@@ -118,10 +120,19 @@ public class PlayerController : MonoBehaviour
 		RaycastHit hitInfo;
 		int layerMask = 1 << 8;
 		if (Physics.Raycast(_muzzleTransform.position, _muzzleTransform.forward, out hitInfo, 100f, layerMask))
-			Debug.Log("Enemy shot");
+			hitInfo.collider.gameObject.GetComponent<IShootable>()?.Hit(_weaponDamage);
+
+		// Recoil effect
+		transform.Rotate(Vector3.up, Random.Range(_recoilStrength/-2, _recoilStrength/2));
+		_attachedCamera.transform.Rotate(Vector3.right, Random.Range(-_recoilStrength, 0));
+
+		// Muzzle flash effect
+		_muzzleTransform.gameObject.SetActive(true);
+		yield return new WaitForSeconds(_shotCooldown/2);
+		_muzzleTransform.gameObject.SetActive(false);
 
 		// Wait for the cooldown and allow fire if the player is not reloading
-		yield return new WaitForSeconds(_shotCooldown);
+		yield return new WaitForSeconds(_shotCooldown/2);
 		_canShoot = true && !_isReloading;
 	}
 
