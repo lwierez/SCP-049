@@ -35,6 +35,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private Transform _muzzleTransform = null;										// Start position for shots
 
 	private Camera _attachedCamera;                                                                 // Camera component
+	private float _cameraAngle = 0;																		// Camera component x angle since the begining of the simulation
 	private UIController _uiController;																// Controller of the UI component
 	private GameObject _flashlight;                                                                 // Flashlight
 
@@ -102,8 +103,13 @@ public class PlayerController : MonoBehaviour
 		transform.Rotate(Vector3.up,
 			Input.GetAxis("Mouse X") * _cameraSensivity.x * Time.fixedDeltaTime);
 		// Camera movement
-		_attachedCamera.transform.Rotate(Vector3.right,
-			Input.GetAxis("Mouse Y") * _cameraSensivity.y * Time.fixedDeltaTime);
+		float movementValue = Input.GetAxis("Mouse Y") * _cameraSensivity.y * Time.fixedDeltaTime;
+		if (_cameraAngle + movementValue < 50 && 
+			(_cameraAngle + movementValue > -30 || movementValue > 0))
+		{
+			_attachedCamera.transform.Rotate(Vector3.right, movementValue);
+			_cameraAngle += movementValue;
+		}
 
 		// Shooting functions
 		if ((isSelectiveFireOnSemi ? Input.GetMouseButtonDown(0) : Input.GetMouseButton(0)) && _canShoot && _remainingAmmo > 0)
@@ -124,7 +130,9 @@ public class PlayerController : MonoBehaviour
 
 		// Recoil effect
 		transform.Rotate(Vector3.up, Random.Range(_recoilStrength/-2, _recoilStrength/2));
-		_attachedCamera.transform.Rotate(Vector3.right, Random.Range(-_recoilStrength, 0));
+		float recoilValue = Random.Range(-_recoilStrength, 0);
+		_attachedCamera.transform.Rotate(Vector3.right, recoilValue);
+		_cameraAngle += recoilValue;
 
 		// Muzzle flash effect
 		_muzzleTransform.gameObject.SetActive(true);

@@ -23,8 +23,8 @@ public class Enemy : MonoBehaviour, IShootable
 
 	public void Die()
 	{
-		GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+		GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None | RigidbodyConstraints.FreezePosition;
+		GetComponent<CapsuleCollider>().enabled = false;
 		transform.Rotate(Vector3.right, 90);
-		this.enabled = false;
 	}
 }
