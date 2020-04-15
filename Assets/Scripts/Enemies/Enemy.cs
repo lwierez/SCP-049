@@ -12,19 +12,21 @@ public class Enemy : MonoBehaviour, IShootable
 
 	public void Hit(float damageAmount)
 	{
-		if (damageAmount < 0)
-			damageAmount = 0;
+		if (health > 0)
+		{
+			if (damageAmount < 0)
+				damageAmount = 0;
 
-		_health -= damageAmount;
+			_health -= damageAmount;
 
-		if (health < 0)
-			Die();
+			if (health < 0)
+				Die();
+		}
 	}
 
 	public void Die()
 	{
-		GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None | RigidbodyConstraints.FreezePosition;
-		GetComponent<CapsuleCollider>().enabled = false;
+		GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
 		transform.Rotate(Vector3.right, 90);
 	}
 }
