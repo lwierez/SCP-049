@@ -105,8 +105,8 @@ public class PlayerController : MonoBehaviour
 			Input.GetAxis("Mouse X") * _cameraSensivity.x * Time.fixedDeltaTime);
 		// Camera movement
 		float movementValue = Input.GetAxis("Mouse Y") * _cameraSensivity.y * Time.fixedDeltaTime;
-		if (_cameraAngle + movementValue < 50 && 
-			(_cameraAngle + movementValue > -30 || movementValue > 0))
+		if (_cameraAngle + movementValue < 35 && 
+			(_cameraAngle + movementValue > -40 || movementValue > 0))
 		{
 			_attachedCamera.transform.Rotate(Vector3.right, movementValue);
 			_cameraAngle += movementValue;
@@ -141,8 +141,12 @@ public class PlayerController : MonoBehaviour
 		// Recoil effect
 		transform.Rotate(Vector3.up, Random.Range(_recoilStrength/-2, _recoilStrength/2));
 		float recoilValue = Random.Range(-_recoilStrength, 0);
-		_attachedCamera.transform.Rotate(Vector3.right, recoilValue);
-		_cameraAngle += recoilValue;
+		Debug.Log(_cameraAngle.ToString());
+		if (_cameraAngle + recoilValue > -40)
+		{
+			_attachedCamera.transform.Rotate(Vector3.right, recoilValue);
+			_cameraAngle += recoilValue;
+		}
 
 		// Muzzle flash effect
 		_muzzleTransform.gameObject.SetActive(true);
