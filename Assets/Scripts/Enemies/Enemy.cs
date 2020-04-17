@@ -15,6 +15,8 @@ public class Enemy : MonoBehaviour, IShootable
 
 	// Reference to the player
 	protected GameObject _player = null;
+	// Is the player in sight
+	protected bool _isChasingPlayer = false;
 	// Distance between the player and the enemy
 	protected float _distanceWithPlayer = 0;
 
@@ -31,6 +33,9 @@ public class Enemy : MonoBehaviour, IShootable
 	{
 		// Updating distance between the player and the enemy
 		_distanceWithPlayer = Vector3.Distance(transform.position, _player.transform.position);
+
+		// Chasing player
+		ChasePlayer();
 	}
 
 	protected IEnumerator InteractWithPlayer()
@@ -45,10 +50,24 @@ public class Enemy : MonoBehaviour, IShootable
 				layerMask = ~layerMask;
 
 				if (Physics.Raycast(transform.position, _player.transform.position - transform.position, out hit, 10, layerMask))
-					Debug.Log("Hit on layer " + hit.collider.gameObject.layer);
+				{
+					Debug.Log(hit.collider.gameObject.layer.ToString());
+					if (hit.collider.gameObject.layer == 9)
+						_isChasingPlayer = true;
+				}
+				else
+					_isChasingPlayer = false;
 			}
 
 			yield return new WaitForSeconds(.33f);
+		}
+	}
+
+	protected void ChasePlayer()
+	{
+		if (_isChasingPlayer)
+		{
+			//transform.position = Vector3.MoveTowards(transform.position, _player.transform.position, 1);
 		}
 	}
 
