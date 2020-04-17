@@ -148,6 +148,9 @@ public class PlayerController : MonoBehaviour
 			_cameraAngle += recoilValue;
 		}
 
+		// Sound effect
+		GetComponentInChildren<WeaponNoise>().TriggerNoise();
+
 		// Muzzle flash effect
 		_muzzleTransform.gameObject.SetActive(true);
 		yield return new WaitForSeconds(_shotCooldown/2);
