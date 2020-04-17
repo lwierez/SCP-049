@@ -67,7 +67,6 @@ public class Enemy : MonoBehaviour, IShootable
 	{
 		if (_isChasingPlayer)
 		{
-			Debug.Log("Yo, I'm triggered");
 			//transform.position = Vector3.MoveTowards(transform.position, _player.transform.position, 1);
 		}
 	}
