@@ -10,6 +10,10 @@ public class Enemy : MonoBehaviour, IShootable
 	[SerializeField] protected float _health = 10;
 	// Range aw which the enemy will try to interact with the player
 	[SerializeField] protected float _maxActionRange = 20;
+	// Damage dealt in one hit
+	[SerializeField] protected int _damageAmount = 6;
+	// Cooldown between each hit
+	[SerializeField] protected float _attackSpeed = .4f;
 
 	public float health { get { return _health; } }
 
@@ -18,6 +22,8 @@ public class Enemy : MonoBehaviour, IShootable
 	protected GameObject _player = null;
 	// Is the player in sight
 	protected bool _isChasingPlayer = false;
+	// Can the enemy attack
+	protected bool _canAttack = true;
 	// Distance between the player and the enemy
 	protected float _distanceWithPlayer = 0;
 
@@ -77,6 +83,19 @@ public class Enemy : MonoBehaviour, IShootable
 		{
 			_navMeshAgent.destination = _player.transform.position;
 		}
+
+		if (_distanceWithPlayer < 1.6 && _canAttack)
+		{
+			_player.GetComponent<PlayerController>()?.Hit(_damageAmount);
+			StartCoroutine(StartAttackCooldown());
+		}
+	}
+
+	protected IEnumerator StartAttackCooldown()
+	{
+		_canAttack = false;
+		yield return new WaitForSeconds(.5f);
+		_canAttack = true;
 	}
 
 	public void TriggerDetection()
@@ -93,7 +112,7 @@ public class Enemy : MonoBehaviour, IShootable
 			if (damageAmount < 0)
 				damageAmount = 0;
 
-			// Updating healt
+			// Updating health
 			_health -= damageAmount;
 
 			// Triggering death if necessary
@@ -107,5 +126,6 @@ public class Enemy : MonoBehaviour, IShootable
 		_navMeshAgent.enabled = false;
 		GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
 		transform.Rotate(Vector3.right, 90);
+		this.enabled = false;
 	}
 }

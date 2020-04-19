@@ -7,6 +7,7 @@ using UnityEngine.Experimental.GlobalIllumination;
 public class PlayerController : MonoBehaviour
 {
 	[Header("Player statistics")]
+	[SerializeField] private int _maxHealth = 10;													// Health of the player
 	[SerializeField] private float _speed = 3f;														// Movement speed
 	[SerializeField] private float _sprintSpeed = 5f;												// Movement speed when sprinting									  
 	[SerializeField] private Vector2 _cameraSensivity = new Vector2(90, -60);                       // X and Y sensivity in the camera
@@ -181,5 +182,20 @@ public class PlayerController : MonoBehaviour
 		_uiController.EndReload(remainingAmmo);
 		_isReloading = false;
 		_canShoot = true;
+	}
+
+	private void Die()
+	{
+		this.enabled = false;
+	}
+
+	public void Hit(int damageAmount)
+	{
+		// Updating health
+		_maxHealth -= damageAmount;
+
+		// Triggering death if necessary
+		if (_maxHealth < 0)
+			Die();
 	}
 }
