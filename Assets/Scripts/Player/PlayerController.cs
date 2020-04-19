@@ -1,12 +1,10 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Experimental.GlobalIllumination;
 
 public class PlayerController : MonoBehaviour
 {
 	[Header("Player statistics")]
+	[SerializeField] private int _health = 10;													// Health of the player
 	[SerializeField] private float _speed = 3f;														// Movement speed
 	[SerializeField] private float _sprintSpeed = 5f;												// Movement speed when sprinting									  
 	[SerializeField] private Vector2 _cameraSensivity = new Vector2(90, -60);                       // X and Y sensivity in the camera
@@ -36,12 +34,13 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private Transform _laserLight = null;											// Light that indicate the impact of a shot
 
 	private Camera _attachedCamera;                                                                 // Camera component
-	private float _cameraAngle = 0;																		// Camera component x angle since the begining of the simulation
+	private float _cameraAngle = 0;																	// Camera component x angle since the begining of the simulation
 	private UIController _uiController;																// Controller of the UI component
 	private GameObject _flashlight;                                                                 // Flashlight
 
 	// Shooting mechanics
 	private bool _canShoot = true;                                                                  // Can the player shoot
+	private bool _wasTriggerReleased = false;														// Was the fire button release since last shot
 	private bool _isReloading = false;																// Is the player reloading
 	private bool _isSelectiveFireOnSemi = true;														// Is the player on semi mod, else he's to be considered on auto
 	private bool isSelectiveFireOnSemi
@@ -77,6 +76,8 @@ public class PlayerController : MonoBehaviour
 			_uiController.UpdateSelectiveFireText("Semi");
 		else
 			_uiController.UpdateSelectiveFireText("Auto");
+		_uiController.SetMaxHealth(_health);
+		_uiController.SetCurrentHealth(_health);
 
 		// Magazine initialization
 		remainingAmmo = _magSize;
@@ -85,11 +86,11 @@ public class PlayerController : MonoBehaviour
 	private void Update()
 	{
 		// Controls
-		if (Input.GetKeyDown(KeyCode.L)) // flashlight
+		if (Input.GetButtonDown("Flashlight")) // flashlight
 			_flashlight.SetActive(!_flashlight.activeSelf);
-		if (Input.GetKeyDown(KeyCode.F)) // selective fire
+		if (Input.GetButtonDown("SelectiveFire")) // selective fire
 			isSelectiveFireOnSemi = !isSelectiveFireOnSemi;
-		if (Input.GetKeyDown(KeyCode.R)) // reload
+		if (Input.GetButtonDown("Reload") && !_isReloading) // reload
 			StartCoroutine(Reload());
 	}
 
@@ -120,8 +121,12 @@ public class PlayerController : MonoBehaviour
 		}
 
 		// Shooting functions
-		if ((isSelectiveFireOnSemi ? Input.GetMouseButtonDown(0) : Input.GetMouseButton(0)) && _canShoot && _remainingAmmo > 0)
+		if ((_isSelectiveFireOnSemi ? _wasTriggerReleased : true) && Input.GetAxis("Fire") > .7 && _canShoot && _remainingAmmo > 0)
 			StartCoroutine(Shoot());
+		if (Input.GetAxis("Fire") > .7)
+			_wasTriggerReleased = false;
+		else if (Input.GetAxis("Fire") < .3)
+			_wasTriggerReleased = true;
 	}
 
 	private IEnumerator Shoot()
@@ -141,12 +146,14 @@ public class PlayerController : MonoBehaviour
 		// Recoil effect
 		transform.Rotate(Vector3.up, Random.Range(_recoilStrength/-2, _recoilStrength/2));
 		float recoilValue = Random.Range(-_recoilStrength, 0);
-		Debug.Log(_cameraAngle.ToString());
 		if (_cameraAngle + recoilValue > -40)
 		{
 			_attachedCamera.transform.Rotate(Vector3.right, recoilValue);
 			_cameraAngle += recoilValue;
 		}
+
+		// Sound effect
+		GetComponentInChildren<WeaponNoise>().TriggerNoise();
 
 		// Muzzle flash effect
 		_muzzleTransform.gameObject.SetActive(true);
@@ -174,5 +181,22 @@ public class PlayerController : MonoBehaviour
 		_uiController.EndReload(remainingAmmo);
 		_isReloading = false;
 		_canShoot = true;
+	}
+
+	private void Die()
+	{
+		this.enabled = false;
+	}
+
+	public void Hit(int damageAmount)
+	{
+		// Updating health
+		_health = Mathf.Max(_health - damageAmount, 0);
+		_uiController.TriggerDamageEffet(_health == 0);
+		_uiController.SetCurrentHealth(_health);
+
+		// Triggering death if necessary
+		if (_health == 0)
+			Die();
 	}
 }
