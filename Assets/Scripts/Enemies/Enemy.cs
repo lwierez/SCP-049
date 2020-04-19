@@ -62,7 +62,7 @@ public class Enemy : MonoBehaviour, IShootable
 				layerMask = ~layerMask;
 
 				// A raycast will determine if it is possible to directly see the player
-				if (Physics.Raycast(transform.position, _player.transform.position - transform.position, out hit, 10, layerMask))
+				if (Physics.Raycast(transform.position, _player.transform.position - transform.position, out hit, 50, layerMask))
 					if (hit.collider.gameObject.layer == 9)
 						_isChasingPlayer = true;
 			}
