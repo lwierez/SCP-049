@@ -97,6 +97,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _health: 15
   _maxActionRange: 20
+  _damageAmount: 8
+  _attackSpeed: 0.4
 --- !u!54 &5803378254342138786
 Rigidbody:
   m_ObjectHideFlags: 0

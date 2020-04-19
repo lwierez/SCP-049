@@ -1,13 +1,10 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Experimental.GlobalIllumination;
 
 public class PlayerController : MonoBehaviour
 {
 	[Header("Player statistics")]
-	[SerializeField] private int _maxHealth = 10;													// Health of the player
+	[SerializeField] private int _health = 10;													// Health of the player
 	[SerializeField] private float _speed = 3f;														// Movement speed
 	[SerializeField] private float _sprintSpeed = 5f;												// Movement speed when sprinting									  
 	[SerializeField] private Vector2 _cameraSensivity = new Vector2(90, -60);                       // X and Y sensivity in the camera
@@ -79,6 +76,8 @@ public class PlayerController : MonoBehaviour
 			_uiController.UpdateSelectiveFireText("Semi");
 		else
 			_uiController.UpdateSelectiveFireText("Auto");
+		_uiController.SetMaxHealth(_health);
+		_uiController.SetCurrentHealth(_health);
 
 		// Magazine initialization
 		remainingAmmo = _magSize;
@@ -192,10 +191,12 @@ public class PlayerController : MonoBehaviour
 	public void Hit(int damageAmount)
 	{
 		// Updating health
-		_maxHealth -= damageAmount;
+		_health = Mathf.Max(_health - damageAmount, 0);
+		_uiController.TriggerDamageEffet(_health == 0);
+		_uiController.SetCurrentHealth(_health);
 
 		// Triggering death if necessary
-		if (_maxHealth < 0)
+		if (_health == 0)
 			Die();
 	}
 }
