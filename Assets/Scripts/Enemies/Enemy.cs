@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour, IShootable
 {
@@ -21,11 +22,18 @@ public class Enemy : MonoBehaviour, IShootable
 	protected float _distanceWithPlayer = 0;
 
 
+	// Reference to the navmesh agent
+	private NavMeshAgent _navMeshAgent = null;
+
+
 	private void Start()
 	{
 		// Initialize player references
 		_player = GameObject.FindGameObjectWithTag("Player");
 		_distanceWithPlayer = Vector3.Distance(transform.position, _player.transform.position);
+
+		// Initialize navmesh agent reference
+		_navMeshAgent = GetComponent<NavMeshAgent>();
 
 		// Starting to look for the player
 		StartCoroutine(InteractWithPlayer());
@@ -65,9 +73,9 @@ public class Enemy : MonoBehaviour, IShootable
 
 	protected void ChasePlayer()
 	{
-		if (_isChasingPlayer)
+		if (_isChasingPlayer && _navMeshAgent.enabled)
 		{
-			//transform.position = Vector3.MoveTowards(transform.position, _player.transform.position, 1);
+			_navMeshAgent.destination = _player.transform.position;
 		}
 	}
 
@@ -96,6 +104,7 @@ public class Enemy : MonoBehaviour, IShootable
 
 	public void Die()
 	{
+		_navMeshAgent.enabled = false;
 		GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
 		transform.Rotate(Vector3.right, 90);
 	}
