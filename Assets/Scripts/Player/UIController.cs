@@ -11,6 +11,11 @@ public class UIController : MonoBehaviour
 	private Color _ammoBaseColor;																	// Base color of the ammo text component
 	[SerializeField] private Text _selectiveFireText = null;                                        // Text component that indicate the selective fire position
 	private string _selectiveFireTextBase;                                                          // Base text for the firemode text component
+	[SerializeField] private Text _healthBarText = null;                                            // Text that indicate the amount of health of the player
+	private int _maxHealth = 10;                                                                    // Storage of the max health
+	private int _currentHealth = 10;																// Current health of the player
+	[SerializeField] private Slider _healthBarSlider = null;                                        // Slider of the health bar
+	[SerializeField] private Animator _damageEffectAnimator = null;									// Animator component for the image of the damage effect
 
 	private void Start()
 	{
@@ -46,5 +51,32 @@ public class UIController : MonoBehaviour
 	public void UpdateSelectiveFireText(string newValue)
 	{
 		_selectiveFireText.text = _selectiveFireTextBase + newValue;
+	}
+
+
+	public void SetMaxHealth(int health)
+	{
+		_maxHealth = health;
+		ReloadHealthUI();
+	}
+
+	public void SetCurrentHealth(int health)
+	{
+		_currentHealth = health;
+		ReloadHealthUI();
+	}
+
+	public void TriggerDamageEffet(bool dead = false)
+	{
+		if (dead)
+			_damageEffectAnimator.SetTrigger("TriggerDeath");
+		else
+			_damageEffectAnimator.SetTrigger("TriggerAnim");
+	}
+
+	private void ReloadHealthUI()
+	{
+		_healthBarText.text = _currentHealth + " / " + _maxHealth;
+		_healthBarSlider.value = _currentHealth == 0 ? 0 : (float)_currentHealth / _maxHealth;
 	}
 }
